@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title> Photo Gallery </ion-title>
+    <ion-title>Photo Gallery</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -11,20 +11,60 @@
     </ion-toolbar>
   </ion-header>
 
-  <!-- CHANGE: Add a grid component to display the photos. -->
+  <!-- Mensaje guía para el usuario -->
+  <div class="ion-padding text-center">
+    <p style="color: var(--ion-color-medium); font-size: 14px; margin-bottom: 10px; text-align: center;">
+      💡 Para eliminar una foto debes seleccionarla primero haciendo clic sobre ella.
+    </p>
+  </div>
+
   <ion-grid>
     <ion-row>
-      <!-- CHANGE: Create a new column and image element for each photo -->
-      @for (photo of photoService.photos(); track photo.filepath; let position = $index) {
-      <ion-col size="6">
-        <img [src]="photo.webviewPath" [attr.alt]="'Photo ' + (position + 1)" loading="lazy" />
-      </ion-col>
+      @for (
+        photo of photoService.photos();
+        track photo.filepath;
+        let position = $index
+      ) {
+        <ion-col size="6">
+          <!-- Al hacer clic se selecciona la foto -->
+          <img
+            [src]="photo.webviewPath"
+            [attr.alt]="'Photo ' + (position + 1)"
+            loading="lazy"
+            (click)="selectPhoto(photo)"
+            [class.selected-border]="selectedPhotoPath === photo.filepath"
+            style="border-radius: 8px; cursor: pointer; border: 3px solid transparent;"
+          />
+
+          <!-- El botón de eliminar solo aparece si esta foto está seleccionada -->
+          @if (selectedPhotoPath === photo.filepath) {
+            <ion-button
+              expand="block"
+              color="danger"
+              size="small"
+              class="ion-margin-top"
+              (click)="deletePhoto(photo.filepath)"
+            >
+              <ion-icon name="trash" slot="start"></ion-icon>
+              Eliminar
+            </ion-button>
+          }
+        </ion-col>
+      } @empty {
+        <ion-col size="12">
+          <p class="empty-message ion-text-center" style="text-align: center; color: var(--ion-color-medium);">
+            Todavía no tienes fotografías. Pulsa el botón de la cámara para comenzar.
+          </p>
+        </ion-col>
       }
     </ion-row>
   </ion-grid>
 
   <ion-fab vertical="bottom" horizontal="center" slot="fixed">
-    <ion-fab-button (click)="addPhotoToGallery()">
+    <ion-fab-button
+      (click)="addPhotoToGallery()"
+      aria-label="Tomar fotografía"
+    >
       <ion-icon name="camera"></ion-icon>
     </ion-fab-button>
   </ion-fab>
